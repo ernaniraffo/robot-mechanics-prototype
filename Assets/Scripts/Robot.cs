@@ -18,10 +18,13 @@ public class Robot : MonoBehaviour
     private float angle;
     Quaternion targetRotation;
 
+    private Animator animator;
+
     // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -37,6 +40,7 @@ public class Robot : MonoBehaviour
         
         // if no input, do not rotate !
         if (Mathf.Abs(input.x) < 1 && Mathf.Abs(input.y) < 1) {
+            SetToIdle();
             return;
         }
 
@@ -68,6 +72,7 @@ public class Robot : MonoBehaviour
     void Move() {
         Vector3 movementDirection = new Vector3(input.x, 0, input.y);
         controller.Move(movementDirection * playerSpeed * Time.deltaTime);
+        SetToWalk();
     }
 
     /// <summary>
@@ -106,5 +111,21 @@ public class Robot : MonoBehaviour
     void Rotate() {
         targetRotation = Quaternion.Euler(0, angle, 0);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+    }
+
+    /// <summary>
+    /// Set robot to use idle animation.
+    /// </summary>
+    void SetToIdle() {
+        animator.SetBool("isIdle", true);
+        animator.SetBool("isWalking", false);
+    }
+
+    /// <summary>
+    /// Set robot to use walking animation.
+    /// </summary>
+    void SetToWalk() {
+        animator.SetBool("isWalking", true);
+        animator.SetBool("isIdle", false);
     }
 }
