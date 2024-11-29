@@ -11,7 +11,7 @@ public class Robot : MonoBehaviour
     private float gravityValue = -9.81f;
     private float playerSpeed = 5.0f;
     private float jumpHeight = 1.0f;
-    private float rotationSpeed = 25f;
+    private float rotationSpeed = 15.0f;
 
     Vector2 input;
     bool jumpInput;
@@ -37,10 +37,8 @@ public class Robot : MonoBehaviour
         
         // if no input, do not rotate !
         if (Mathf.Abs(input.x) < 1 && Mathf.Abs(input.y) < 1) {
-            Debug.Log("Stop rotating!");
             return;
         }
-        // Debug.Log("Movement: " + input);
 
         CalculateDirection();
         Rotate();
@@ -100,7 +98,6 @@ public class Robot : MonoBehaviour
     void CalculateDirection() {
         angle = Mathf.Atan2(input.x, input.y);
         angle = Mathf.Rad2Deg * angle;
-        // Debug.Log("Angle: " + angle);
     }
 
     /// <summary>
