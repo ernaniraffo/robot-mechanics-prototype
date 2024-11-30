@@ -32,15 +32,21 @@ public class Robot : MonoBehaviour
     {
         GetInput();
 
+        if (IsGrounded()) {
+            SetToGrounded();
+        }
+
         // Jump if needed and fall
         if (jumpInput && IsGrounded()) {
             Jump();
         }
         Fall();
         
-        // if no input, do not rotate !
+        // if no input, do not rotate and set to idle if not in jumping state
         if (Mathf.Abs(input.x) < 1 && Mathf.Abs(input.y) < 1) {
-            SetToIdle();
+            if (!IsJumping()) {
+                SetToIdle();
+            }
             return;
         }
 
@@ -64,6 +70,7 @@ public class Robot : MonoBehaviour
     void Jump() {
         Debug.Log("Performing a jump");
         playerVelocity.y += Mathf.Sqrt(jumpHeight * -2.0f * gravityValue);
+        SetToJump();
     }
 
     /// <summary>
@@ -72,6 +79,7 @@ public class Robot : MonoBehaviour
     void Move() {
         Vector3 movementDirection = new Vector3(input.x, 0, input.y);
         controller.Move(movementDirection * playerSpeed * Time.deltaTime);
+        if (IsJumping()) return;
         SetToWalk();
     }
 
@@ -117,15 +125,49 @@ public class Robot : MonoBehaviour
     /// Set robot to use idle animation.
     /// </summary>
     void SetToIdle() {
-        animator.SetBool("isIdle", true);
-        animator.SetBool("isWalking", false);
+        SetIdle(true);
+        SetJumping(false);
+        SetWalking(false);
     }
 
     /// <summary>
     /// Set robot to use walking animation.
     /// </summary>
     void SetToWalk() {
-        animator.SetBool("isWalking", true);
-        animator.SetBool("isIdle", false);
+        SetJumping(false);
+        SetIdle(false);
+        SetWalking(true);
+    }
+
+    void SetToJump() {
+        SetGrounded(false);
+        SetWalking(false);
+        SetIdle(false);
+        SetJumping(true);
+    }
+
+    void SetToGrounded() {
+        SetGrounded(true);
+        SetJumping(false);
+    }
+
+    bool IsJumping() {
+        return animator.GetBool("isJumping");
+    }
+
+    void SetGrounded(bool grounded) {
+        animator.SetBool("isGrounded", grounded);
+    }
+
+    void SetWalking(bool walking) {
+        animator.SetBool("isWalking", walking);
+    }
+
+    void SetIdle(bool idle) {
+        animator.SetBool("isIdle", idle);
+    }
+
+    void SetJumping(bool jumping) {
+        animator.SetBool("isJumping", jumping);
     }
 }
