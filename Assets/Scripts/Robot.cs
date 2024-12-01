@@ -10,8 +10,12 @@ public class Robot : MonoBehaviour
     private bool groundedPlayer;
     private float gravityValue = -9.81f;
     private float playerSpeed = 5.0f;
-    private float jumpHeight = 1.0f;
+    public float jumpHeight;
     private float rotationSpeed = 15.0f;
+    public float gravityMultiplier;
+    float timeAtJump;
+    float timeAtFall;
+    float airTime = -1f;
 
     Vector2 input;
     bool jumpInput;
@@ -68,8 +72,14 @@ public class Robot : MonoBehaviour
     /// Perform a jump.
     /// </summary>
     void Jump() {
-        Debug.Log("Performing a jump");
-        playerVelocity.y += Mathf.Sqrt(jumpHeight * -2.0f * gravityValue);
+        // Debug.Log("Performing a jump");
+        airTime = -1f;
+        // If we are performing a jump, we were grounded: we can set the player velocity directly
+        // to which height we want to reach.
+        playerVelocity.y = Mathf.Sqrt(jumpHeight * -2.0f * gravityValue);
+        // timeAtJump = Time.time;
+        
+        // set jumping animations parameters
         SetToJump();
     }
 
@@ -101,7 +111,21 @@ public class Robot : MonoBehaviour
             playerVelocity.y = 0f;
         }
         // make the player fall according to gravity
-        playerVelocity.y += gravityValue * Time.deltaTime;
+        float gravityScale = gravityValue;
+        // player has reached peak of jump and is starting to fall
+        if (playerVelocity.y < 0) {
+            // debug air time
+            // if (airTime == -1f) {
+            //     timeAtFall = Time.time;
+            //     airTime = timeAtFall - timeAtJump;
+            //     Debug.Log("Total air time to peak: " + airTime);
+            // }
+            // multiply gravity scale by multiplier for faster fall
+            gravityScale *= gravityMultiplier;
+        }
+        // increase the player velocity by gravity scale and delta time to make player fall
+        playerVelocity.y += gravityScale * Time.deltaTime;
+        // move the player down (0, falling velocity, 0)
         controller.Move(playerVelocity * Time.deltaTime);
     }
 
@@ -147,6 +171,7 @@ public class Robot : MonoBehaviour
     }
 
     void SetToGrounded() {
+        SetVerticalVelocity(0);
         SetGrounded(true);
         SetJumping(false);
     }
@@ -169,5 +194,9 @@ public class Robot : MonoBehaviour
 
     void SetJumping(bool jumping) {
         animator.SetBool("isJumping", jumping);
+    }
+
+    void SetVerticalVelocity(float val) {
+        playerVelocity.y = val;
     }
 }
