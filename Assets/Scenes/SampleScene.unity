@@ -473,7 +473,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7920627892104691784, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
       propertyPath: gravityMultiplier
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
