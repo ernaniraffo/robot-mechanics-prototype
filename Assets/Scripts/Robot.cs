@@ -7,20 +7,20 @@ public class Robot : MonoBehaviour
 {
     CharacterController controller;
     private Vector3 playerVelocity;
-    private bool groundedPlayer;
     private float gravityValue = -9.81f;
     private float playerSpeed = 5.0f;
     public float jumpHeight;
     private float rotationSpeed = 15.0f;
     public float gravityMultiplier;
-    float timeAtJump;
-    float timeAtFall;
-    float airTime = -1f;
 
     Vector2 input;
     bool jumpInput;
     private float angle;
     Quaternion targetRotation;
+
+    // Variable for coyote time
+    private float coyoteFramesAllowed = 10;
+    private float coyoteFrames = 0;
 
     private Animator animator;
 
@@ -40,10 +40,11 @@ public class Robot : MonoBehaviour
             SetToGrounded();
         }
 
-        // Jump if needed and fall
-        if (jumpInput && IsGrounded()) {
+        // Jump if the player is grounded or if the player is in coyote time.
+        if ((jumpInput && IsGrounded()) || (jumpInput && coyoteFrames > 0 && coyoteFrames < coyoteFramesAllowed)) {
             Jump();
         }
+        // Fall according to gravity
         Fall();
         
         // if no input, do not rotate and set to idle if not in jumping state
@@ -72,15 +73,13 @@ public class Robot : MonoBehaviour
     /// Perform a jump.
     /// </summary>
     void Jump() {
-        // Debug.Log("Performing a jump");
-        airTime = -1f;
         // If we are performing a jump, we were grounded: we can set the player velocity directly
         // to which height we want to reach.
         playerVelocity.y = Mathf.Sqrt(jumpHeight * -2.0f * gravityValue);
-        // timeAtJump = Time.time;
-        
         // set jumping animations parameters
         SetToJump();
+        // reset coyote frames
+        ResetCoyoteFrames();
     }
 
     /// <summary>
@@ -105,21 +104,16 @@ public class Robot : MonoBehaviour
     /// Make the player fall downwards according to gravity. Set player velocity to 0. 
     /// </summary>
     void Fall() {
-        groundedPlayer = IsGrounded();
         // clamp player velocity
-        if (groundedPlayer && playerVelocity.y < 0) {
+        if (IsGrounded() && playerVelocity.y < 0) {
             playerVelocity.y = 0f;
+            // f = 0
+            ResetCoyoteFrames();
         }
         // make the player fall according to gravity
         float gravityScale = gravityValue;
         // player has reached peak of jump and is starting to fall
         if (playerVelocity.y < 0) {
-            // debug air time
-            // if (airTime == -1f) {
-            //     timeAtFall = Time.time;
-            //     airTime = timeAtFall - timeAtJump;
-            //     Debug.Log("Total air time to peak: " + airTime);
-            // }
             // multiply gravity scale by multiplier for faster fall
             gravityScale *= gravityMultiplier;
         }
@@ -127,6 +121,10 @@ public class Robot : MonoBehaviour
         playerVelocity.y += gravityScale * Time.deltaTime;
         // move the player down (0, falling velocity, 0)
         controller.Move(playerVelocity * Time.deltaTime);
+
+        if (IsFalling()) {
+            coyoteFrames++;
+        }
     }
 
     /// <summary>
@@ -163,6 +161,9 @@ public class Robot : MonoBehaviour
         SetWalking(true);
     }
 
+    /// <summary>
+    /// Set the player to jump.
+    /// </summary>
     void SetToJump() {
         SetGrounded(false);
         SetWalking(false);
@@ -170,33 +171,76 @@ public class Robot : MonoBehaviour
         SetJumping(true);
     }
 
+    /// <summary>
+    /// Set the player to grounded.
+    /// </summary>
     void SetToGrounded() {
         SetVerticalVelocity(0);
         SetGrounded(true);
         SetJumping(false);
     }
 
+    /// <summary>
+    /// Return true if the player is jumping.
+    /// </summary>
+    /// <returns>bool</returns>
     bool IsJumping() {
         return animator.GetBool("isJumping");
     }
 
+    /// <summary>
+    /// Set the grounded animation.
+    /// </summary>
+    /// <param name="grounded">bool</param>
     void SetGrounded(bool grounded) {
         animator.SetBool("isGrounded", grounded);
     }
 
+    /// <summary>
+    /// Set the walking animation.
+    /// </summary>
+    /// <param name="walking">bool</param>
     void SetWalking(bool walking) {
         animator.SetBool("isWalking", walking);
     }
 
+    /// <summary>
+    /// Set the idle animation.
+    /// </summary>
+    /// <param name="idle">bool</param>
     void SetIdle(bool idle) {
         animator.SetBool("isIdle", idle);
     }
 
+    /// <summary>
+    /// Set the jumping animation.
+    /// </summary>
+    /// <param name="jumping">bool</param>
     void SetJumping(bool jumping) {
         animator.SetBool("isJumping", jumping);
     }
 
+    /// <summary>
+    /// Set the vertical velocity of the player.
+    /// </summary>
+    /// <param name="val">float</param>
     void SetVerticalVelocity(float val) {
         playerVelocity.y = val;
+    }
+
+    /// <summary>
+    /// Reset coyote frames.
+    /// </summary>
+    private void ResetCoyoteFrames() {
+        coyoteFrames = 0;
+    }
+    
+    /// <summary>
+    /// Return true if the player is falling.
+    /// The player is falling if he is not grounded and not jumping.
+    /// </summary>
+    /// <returns></returns>
+    bool IsFalling() {
+        return !IsGrounded() && !IsJumping();
     }
 }
