@@ -7,7 +7,7 @@ public class Robot : MonoBehaviour
 {
     CharacterController controller;
     private Vector3 playerVelocity;
-    private float gravityValue = -9.81f;
+    private float gravityValue = Physics.gravity.y;
     private float playerSpeed = 5.0f;
     public float jumpHeight;
     private float rotationSpeed = 15.0f;
@@ -24,6 +24,9 @@ public class Robot : MonoBehaviour
 
     private Animator animator;
 
+    // Variables for jump input cut
+    private bool jumpInputCut;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -38,11 +41,16 @@ public class Robot : MonoBehaviour
 
         if (IsGrounded()) {
             SetToGrounded();
+            ResetGravity();
         }
 
         // Jump if the player is grounded or if the player is in coyote time.
         if ((jumpInput && IsGrounded()) || (jumpInput && coyoteFrames > 0 && coyoteFrames < coyoteFramesAllowed)) {
             Jump();
+        } else if (jumpInputCut && IsJumping()) {
+            // If the player releases the jump button, we want to cut the jump.
+            // This is done by setting the player velocity to 0.
+            SetGravity(gravityValue * gravityMultiplier * 0.5f);
         }
         // Fall according to gravity
         Fall();
@@ -67,6 +75,7 @@ public class Robot : MonoBehaviour
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
         jumpInput = Input.GetButton("Jump");
+        jumpInputCut = Input.GetButtonUp("Jump");
     }
 
     /// <summary>
@@ -110,7 +119,6 @@ public class Robot : MonoBehaviour
             // f = 0
             ResetCoyoteFrames();
         }
-        // make the player fall according to gravity
         float gravityScale = gravityValue;
         // player has reached peak of jump and is starting to fall
         if (playerVelocity.y < 0) {
@@ -242,5 +250,20 @@ public class Robot : MonoBehaviour
     /// <returns></returns>
     bool IsFalling() {
         return !IsGrounded() && !IsJumping();
+    }
+
+    /// <summary>
+    /// Reset the gravity value to the default gravity value.   
+    /// </summary>
+    void ResetGravity() {
+        gravityValue = Physics.gravity.y;
+    }
+
+    /// <summary>
+    /// Set the gravity value.
+    /// </summary>
+    /// <param name="val">float</param> 
+    void SetGravity(float val) {
+        gravityValue = val;
     }
 }
