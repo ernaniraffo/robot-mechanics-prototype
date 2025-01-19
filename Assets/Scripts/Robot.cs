@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Robot : MonoBehaviour
 {
@@ -27,11 +28,25 @@ public class Robot : MonoBehaviour
     // Variables for jump input cut
     private bool jumpInputCut;
 
+    // Testing controller input
+    Gamepad gamepad;
+
     // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+
+        // Find a game controller
+        var devices = InputSystem.devices;
+        for (var i = 0; i < devices.Count; ++i)
+        {
+            var device = devices[i];
+            if (device is Joystick || device is Gamepad)
+            {
+                gamepad = Gamepad.current;
+            }
+        }
     }
 
     // Update is called once per frame
@@ -56,7 +71,11 @@ public class Robot : MonoBehaviour
         Fall();
         
         // if no input, do not rotate and set to idle if not in jumping state
-        if (Mathf.Abs(input.x) < 1 && Mathf.Abs(input.y) < 1) {
+        // *** 
+        // currently set to 0.05 instead of 1. changing this fixed a bug where the player
+        // was not moving diagonally and had choppy movement.
+        // ***
+        if (Mathf.Abs(input.x) < 0.05 && Mathf.Abs(input.y) < 0.05) {
             if (!IsJumping()) {
                 SetToIdle();
             }
@@ -72,10 +91,19 @@ public class Robot : MonoBehaviour
     /// Get the raw input from player. Value for axis is either -1, 0, 1.
     /// </summary>
     void GetInput() {
-        input.x = Input.GetAxisRaw("Horizontal");
-        input.y = Input.GetAxisRaw("Vertical");
-        jumpInput = Input.GetButton("Jump");
-        jumpInputCut = Input.GetButtonUp("Jump");
+        if (gamepad != null) {
+            // Debug.Log("Left stick X axis input: " + gamepad.leftStick.x.ReadValue());
+            // Debug.Log("Left stick Y axis input: " + gamepad.leftStick.y.ReadValue());
+            input.x = gamepad.leftStick.x.ReadValue();
+            input.y = gamepad.leftStick.y.ReadValue();
+            jumpInput = gamepad.crossButton.isPressed;
+            jumpInputCut = gamepad.crossButton.wasReleasedThisFrame;
+        } else {
+            input.x = Input.GetAxisRaw("Horizontal");
+            input.y = Input.GetAxisRaw("Vertical");
+            jumpInput = Input.GetButton("Jump");
+            jumpInputCut = Input.GetButtonUp("Jump");
+        }
     }
 
     /// <summary>
@@ -210,6 +238,14 @@ public class Robot : MonoBehaviour
     /// <param name="walking">bool</param>
     void SetWalking(bool walking) {
         animator.SetBool("isWalking", walking);
+    }
+
+    /// <summary>
+    /// Return true if the player is walking.
+    /// </summary>
+    /// <returns>bool</returns>
+    public bool IsWalking() {
+        return animator.GetBool("isWalking");
     }
 
     /// <summary>
