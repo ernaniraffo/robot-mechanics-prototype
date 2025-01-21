@@ -14,8 +14,12 @@ public class Robot : MonoBehaviour
     private float rotationSpeed = 15.0f;
     public float gravityMultiplier;
 
+    // INPUTS
     Vector2 input;
     bool jumpInput;
+    bool dodgeInput;
+
+    // ROTATION VARIABLES
     private float angle;
     Quaternion targetRotation;
 
@@ -59,6 +63,10 @@ public class Robot : MonoBehaviour
             ResetGravity();
         }
 
+        if (!dodgeInput) {
+            SetDodging(false);
+        }
+
         // Jump if the player is grounded or if the player is in coyote time.
         if ((jumpInput && IsGrounded()) || (jumpInput && coyoteFrames > 0 && coyoteFrames < coyoteFramesAllowed)) {
             Jump();
@@ -66,7 +74,11 @@ public class Robot : MonoBehaviour
             // If the player releases the jump button, we want to cut the jump.
             // This is done by setting the player velocity to 0.
             SetGravity(gravityValue * gravityMultiplier * 0.5f);
+        } else if (!IsJumping() && dodgeInput && !IsDodging()) {
+            Debug.Log("Setting dodging animation");
+            SetToDodge();
         }
+
         // Fall according to gravity
         Fall();
         
@@ -76,7 +88,7 @@ public class Robot : MonoBehaviour
         // was not moving diagonally and had choppy movement.
         // ***
         if (Mathf.Abs(input.x) < 0.05 && Mathf.Abs(input.y) < 0.05) {
-            if (!IsJumping()) {
+            if (!IsJumping() && !IsDodging()) {
                 SetToIdle();
             }
             return;
@@ -98,6 +110,7 @@ public class Robot : MonoBehaviour
             input.y = gamepad.leftStick.y.ReadValue();
             jumpInput = gamepad.crossButton.isPressed;
             jumpInputCut = gamepad.crossButton.wasReleasedThisFrame;
+            dodgeInput = gamepad.circleButton.wasPressedThisFrame;
         } else {
             input.x = Input.GetAxisRaw("Horizontal");
             input.y = Input.GetAxisRaw("Vertical");
@@ -125,7 +138,7 @@ public class Robot : MonoBehaviour
     void Move() {
         Vector3 movementDirection = new Vector3(input.x, 0, input.y);
         controller.Move(movementDirection * playerSpeed * Time.deltaTime);
-        if (IsJumping()) return;
+        if (IsJumping() || IsDodging()) return;
         SetToWalk();
     }
 
@@ -186,6 +199,7 @@ public class Robot : MonoBehaviour
         SetIdle(true);
         SetJumping(false);
         SetWalking(false);
+        SetDodging(false);
     }
 
     /// <summary>
@@ -195,6 +209,7 @@ public class Robot : MonoBehaviour
         SetJumping(false);
         SetIdle(false);
         SetWalking(true);
+        SetDodging(false);
     }
 
     /// <summary>
@@ -205,6 +220,7 @@ public class Robot : MonoBehaviour
         SetWalking(false);
         SetIdle(false);
         SetJumping(true);
+        SetDodging(false);
     }
 
     /// <summary>
@@ -214,6 +230,17 @@ public class Robot : MonoBehaviour
         SetVerticalVelocity(0);
         SetGrounded(true);
         SetJumping(false);
+        SetDodging(false);
+    }
+
+    void SetToDodge() {
+        SetGrounded(false); // we are not grounded if dodging
+        SetWalking(false); // we are not walking
+        SetIdle(false); // we are not idle
+        SetJumping(false); // we are not jumping (ideally this is already false)
+        
+        // set the dodge animation
+        SetDodging(true);
     }
 
     /// <summary>
@@ -261,7 +288,21 @@ public class Robot : MonoBehaviour
     /// </summary>
     /// <param name="jumping">bool</param>
     void SetJumping(bool jumping) {
+        Debug.Log("Setting jumping to " + jumping);
         animator.SetBool("isJumping", jumping);
+    }
+
+    /// <summary>
+    /// Set the dodging animation.
+    /// </summary>
+    /// <param name="dodging">bool</param>
+    void SetDodging(bool dodging) {
+        Debug.Log("Set isDodging to " + dodging);
+        animator.SetBool("isDodging", dodging);
+    }
+
+    bool IsDodging() {
+        return animator.GetBool("isDodging");
     }
 
     /// <summary>
