@@ -18,6 +18,9 @@ public class Robot : MonoBehaviour
     Vector2 input;
     bool jumpInput;
     bool dodgeInput;
+    bool dashInput;
+    // TODO: remove the dashing boolean variable and replace logic with animation
+    bool dashing = false;
 
     // ROTATION VARIABLES
     private float angle;
@@ -77,6 +80,9 @@ public class Robot : MonoBehaviour
         } else if (!IsJumping() && dodgeInput && !IsDodging()) {
             Debug.Log("Setting dodging animation");
             SetToDodge();
+        } else if (!dashing && dashInput && !IsDodging()) {
+            // Dash only if the player is not dodging
+            Dash();
         }
 
         // Fall according to gravity
@@ -88,7 +94,7 @@ public class Robot : MonoBehaviour
         // was not moving diagonally and had choppy movement.
         // ***
         if (Mathf.Abs(input.x) < 0.05 && Mathf.Abs(input.y) < 0.05) {
-            if (!IsJumping() && !IsDodging()) {
+            if (!IsJumping() && !IsDodging() && !dashing) {
                 SetToIdle();
             }
             return;
@@ -111,6 +117,7 @@ public class Robot : MonoBehaviour
             jumpInput = gamepad.crossButton.isPressed;
             jumpInputCut = gamepad.crossButton.wasReleasedThisFrame;
             dodgeInput = gamepad.circleButton.wasPressedThisFrame;
+            dashInput = gamepad.squareButton.wasPressedThisFrame;
         } else {
             input.x = Input.GetAxisRaw("Horizontal");
             input.y = Input.GetAxisRaw("Vertical");
@@ -190,6 +197,37 @@ public class Robot : MonoBehaviour
     void Rotate() {
         targetRotation = Quaternion.Euler(0, angle, 0);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+    }
+
+    void Dash() {
+        StartCoroutine(EnableDashing());
+    }
+
+    IEnumerator EnableDashing() {
+        dashing = true;
+        // Dash for 0.25 seconds
+        float dashTime = 0.25f;
+        // Save the time in which the dashing started
+        float startTime = Time.time;
+        // Save the original player speed
+        float originalPlayerSpeed = playerSpeed;
+        // Multiply the player speed to dash
+        playerSpeed *= 4;
+        while (Time.time < startTime + dashTime) {
+            yield return null;
+        }
+        // // Now that we have dashed, cool down for 0.25 seconds
+        // float coolDownTime = 0.25f;
+        // // Reduce the player original speed by half during the cool down
+        // playerSpeed = originalPlayerSpeed / 2;
+        // // Cool down for some time
+        // float coolDownStartTime = Time.time;
+        // while (Time.time < coolDownStartTime + coolDownTime) {
+        //     yield return null;
+        // }
+        // Revert the speed to the original speed
+        playerSpeed = originalPlayerSpeed;
+        dashing = false;
     }
 
     /// <summary>
