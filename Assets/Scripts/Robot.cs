@@ -9,6 +9,7 @@ public class Robot : MonoBehaviour
     CharacterController controller;
     private Vector3 playerVelocity;
     private float gravityValue = Physics.gravity.y;
+    private const float originalPlayerSpeed = 5.0f;
     private float playerSpeed = 5.0f;
     public float jumpHeight;
     private float rotationSpeed = 15.0f;
@@ -21,6 +22,7 @@ public class Robot : MonoBehaviour
     bool dashInput;
     // TODO: remove the dashing boolean variable and replace logic with animation
     bool dashing = false;
+    bool runningInput;
 
     // ROTATION VARIABLES
     private float angle;
@@ -118,6 +120,7 @@ public class Robot : MonoBehaviour
             jumpInputCut = gamepad.crossButton.wasReleasedThisFrame;
             dodgeInput = gamepad.circleButton.wasPressedThisFrame;
             dashInput = gamepad.squareButton.wasPressedThisFrame;
+            runningInput = gamepad.leftStickButton.isPressed;
         } else {
             input.x = Input.GetAxisRaw("Horizontal");
             input.y = Input.GetAxisRaw("Vertical");
@@ -144,8 +147,19 @@ public class Robot : MonoBehaviour
     /// </summary>
     void Move() {
         Vector3 movementDirection = new Vector3(input.x, 0, input.y);
+        // If the player is trying to run and they are walking, we can increase the speed.
+        // If the player is not dashing and not running but the player speed exceeds the original
+        // player speed, this means we stopped running, so we need to reset the speed.
+        if (runningInput && IsWalking() && !dashing) {
+            // start running
+            playerSpeed = originalPlayerSpeed * 2;
+        } else if (!runningInput && !dashing && playerSpeed > originalPlayerSpeed) {
+            // reset the speed
+            playerSpeed = originalPlayerSpeed;
+        }
         controller.Move(movementDirection * playerSpeed * Time.deltaTime);
         if (IsJumping() || IsDodging()) return;
+        // Set the walking animation
         SetToWalk();
     }
 
