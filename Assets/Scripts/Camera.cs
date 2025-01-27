@@ -19,33 +19,12 @@ public class Camera : MonoBehaviour
     {
         offset = transform.position - player.transform.position;
         robot = player.GetComponent<Robot>();
-
-        gamepad = Gamepad.current;
     }
 
     // Update is called once per frame
     void Update()
     {
-        GetGamePadInput();
-        RotateCameraAroundPlayer();
-
         // Only update the camera position if player is walking
         //transform.position = new Vector3(player.transform.position.x + offset.x, transform.position.y, player.transform.position.z + offset.z);
-    }
-
-    void GetGamePadInput() {
-        if (gamepad == null) return;
-        cameraRotateInput = gamepad.rightStick.ReadValue();
-    }
-
-    void RotateCameraAroundPlayer() {
-        if (cameraRotateInput == null) return;
-        float horizontalInput = cameraRotateInput.x;
-        float verticalInput = cameraRotateInput.y;
-        float sensitivity = 0.25f;
-        // Rotate in regards to the X axis (side to side)
-        transform.RotateAround(player.transform.position, -Vector3.up, cameraRotateInput.x * sensitivity);
-        // Rotate in regards to the X axis (side to side)
-        transform.RotateAround(Vector3.zero, transform.right, cameraRotateInput.y * sensitivity);
     }
 }
