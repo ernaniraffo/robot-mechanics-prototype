@@ -625,7 +625,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerIndex: -1
   AutoEnableInputs: 1
-  XYAxis: {fileID: -5630151704836100654, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  XYAxis: {fileID: 2708365643695195444, guid: 33643bb4d343342f58620c8868c04728, type: 3}
   ZAxis: {fileID: 0}
 --- !u!1 &841160297
 GameObject:
@@ -748,7 +748,7 @@ MonoBehaviour:
       m_LegacyHeadingDefinition: -1
       m_LegacyVelocityFilterStrength: -1
   m_VerticalRecentering:
-    m_enabled: 1
+    m_enabled: 0
     m_WaitTime: 2
     m_RecenteringTime: 0.5
     m_LegacyHeadingDefinition: -1
@@ -772,7 +772,7 @@ MonoBehaviour:
       m_LegacyHeadingDefinition: -1
       m_LegacyVelocityFilterStrength: -1
   m_HorizontalRecentering:
-    m_enabled: 1
+    m_enabled: 0
     m_WaitTime: 2
     m_RecenteringTime: 0.5
     m_LegacyHeadingDefinition: -1
@@ -1010,6 +1010,61 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &1220848639 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1832589894835765062, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
+  m_PrefabInstance: {fileID: 3702727653573173452}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1220848643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1220848639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 33643bb4d343342f58620c8868c04728, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 053ea1b2-6754-4210-ac0f-524b5475e832
+    m_ActionName: gameplay/jump[/Mouse/leftButton,/Pen/tip]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: cd9466f2-740b-498a-a3ef-91edebff8340
+    m_ActionName: gameplay/move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: e8e5d8a5-c915-4cd2-81a4-f7c2a18fae75
+    m_ActionName: gameplay/look[/Mouse/delta,/Pen/delta]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: bd2e6f41-f3ad-4592-85f8-66239cd23c1d
+    m_ActionName: gameplay/dodge[/Keyboard/q]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c74c1a12-c7b2-494b-985e-7d7495738f3b
+    m_ActionName: gameplay/dash[/Mouse/rightButton,/Pen/barrel1]
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: gameplay
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &1259101821
 GameObject:
   m_ObjectHideFlags: 0
@@ -1178,7 +1233,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1832589894835765062, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1220848643}
   m_SourcePrefab: {fileID: 100100000, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
