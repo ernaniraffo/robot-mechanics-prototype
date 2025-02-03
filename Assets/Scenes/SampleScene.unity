@@ -1028,7 +1028,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: 33643bb4d343342f58620c8868c04728, type: 3}
-  m_NotificationBehavior: 0
+  m_NotificationBehavior: 2
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
@@ -1041,7 +1041,19 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3702727653573173453}
+        m_TargetAssemblyTypeName: Robot_UsingPlayerInput, Assembly-CSharp
+        m_MethodName: OnJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 053ea1b2-6754-4210-ac0f-524b5475e832
     m_ActionName: gameplay/jump[/Mouse/leftButton,/Pen/tip]
   - m_PersistentCalls:
@@ -1060,11 +1072,20 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: c74c1a12-c7b2-494b-985e-7d7495738f3b
     m_ActionName: gameplay/dash[/Mouse/rightButton,/Pen/barrel1]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: a256847f-fb41-4ad6-a30e-0ae7950378a0
+    m_ActionName: gameplay/sprint[/Keyboard/leftShift]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: gameplay
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!95 &1220848645 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 4758974347516445847, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
+  m_PrefabInstance: {fileID: 3702727653573173452}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1259101821
 GameObject:
   m_ObjectHideFlags: 0
@@ -1182,6 +1203,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Robot
       objectReference: {fileID: 0}
+    - target: {fileID: 5129757496156242068, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 1220848645}
     - target: {fileID: 7078136030270616444, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.49999994
@@ -1238,6 +1263,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1220848643}
   m_SourcePrefab: {fileID: 100100000, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
+--- !u!114 &3702727653573173453 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5129757496156242068, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
+  m_PrefabInstance: {fileID: 3702727653573173452}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1220848639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fb13f25ace204be2b3c6ee87d1a270c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
