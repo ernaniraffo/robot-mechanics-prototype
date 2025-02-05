@@ -11,6 +11,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
 
     // PUBLIC VARIABLES
     public float jumpHeight;
+    public float gravityFallingMultiplier;
 
     // PRIVATE VARIABLES
     private Vector3 playerVelocity;
@@ -28,38 +29,17 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     private bool dashInput;
     private bool sprintInput;
 
-    void Awake()
-    {
-        // Store the character controller component
-        characterController = gameObject.GetComponent<CharacterController>();
-        Debug.Log("Character controller: " + characterController);
-        animator = gameObject.GetComponent<Animator>();
-        // Store the animator component to enable/disable animations
-    }
-
-    void Update()
-    {
-        // Calculate gravity
-        // Rotate character in direction of movement before moving
-        // TODO: add special dodge or go backwards if dodging but no movement
-        // TODO: add dashing forwards when idle
-        // Move (includes dodging, dashing)
-    }
-
     /// <summary>
     /// Store the jump input as a boolean.
     /// </summary>
     /// <param name="context"></param>
     public void OnJump(InputAction.CallbackContext context)
     {
-        Debug.Log("Jump action pressed");
         switch (context.phase)
         {
             case InputActionPhase.Started:
                 // Set jump input to true if it has started
-                Debug.Log("Setting jumpInput to true");
-                jumpInput = true; // TODO: this may be redundant line
-                animator.SetBool("isJumping", jumpInput);
+                jumpInput = true;
                 break;
             case InputActionPhase.Performed:
                 // Check if the interaction has been released in the duration to be a tap interaction.
@@ -67,11 +47,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
                 if (context.interaction is TapInteraction)
                 {
                     jumpInputCut = true;
-                    Debug.Log("Cutting jump input");
                 }
-                break;
-            case InputActionPhase.Canceled:
-                // The action has stopped
                 break;
         }
     }
@@ -121,6 +97,33 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         sprintInput = context.ReadValue<bool>();
     }
 
+    void Start()
+    {
+        characterController = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
+    }
+
+    void Update()
+    {
+        if (characterController.isGrounded) {
+            SetJumping(false);
+            playerVelocity.y = 0;
+        }
+
+        // Jump if there is jump input
+        if (jumpInput && characterController.isGrounded) {
+            Jump();
+            jumpInput = false;
+        }
+        // Calculate gravity
+        HandleVerticalVelocity();
+        // Rotate character in direction of movement before moving
+        // TODO: add special dodge or go backwards if dodging but no movement
+        // TODO: add dashing forwards when idle
+        // Move (includes dodging, dashing)
+        Move();
+    }
+
     /// <summary>
     /// Increase the player's Y-axis velocity and reset coyote frames if any.
     /// This method is called in the start of the jumping animation attached to the robot prefab.
@@ -129,22 +132,59 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         Debug.Log("Start jumping!");
         // The jumping action corresponds to increasing the player's Y-axis velocity
         playerVelocity.y = Mathf.Sqrt(jumpHeight * -2.0f * gravityValue);
+        Debug.Log("Calculated player's Y velocity = " + playerVelocity.y);
         // Reset the coyote frames since we have started jumping
         coyoteFrames = 0;
+        // // Set the jumping animation
+        SetJumping(true);
     }
 
     /// <summary>
-    /// Reset the jumping animation.
+    /// Caculate the movement direction and move the character.
+    /// TODO: Move relative to the camera.
     /// </summary>
-    // public void ResetJump() {
-    //     // Mark the animation
-    //     SetJumpAnimation(true);
-    // }
+    private void Move() {
+        // Get the movement direction
+        Vector3 movementDirection = new Vector3(moveInput.x, playerVelocity.y, moveInput.y);
+        // Move the character in the movement direction with the player speed
+        // This last move call with update the collision flags
+        // It is recommended to only have one move method per frame since each call updates the
+        // collision flags
+        characterController.Move(movementDirection * Time.deltaTime);
+        Debug.Log("Movement direction: " + movementDirection + " ## isGrounded: " + characterController.isGrounded);
+    }
 
-    // private void SetJumpAnimation(bool val) {
-    //     Debug.Log("Jump animation is set to " + animator.GetBool("isJumping"));
-    //     Debug.Log("Setting jump animation to " + val);
-    //     animator.SetBool("isJumping", true);
-    //     Debug.Log("Jump animation is set to " + animator.GetBool("isJumping"));
-    // }
+    private void HandleVerticalVelocity() {
+        // clamp player velocity
+        if (characterController.isGrounded && playerVelocity.y < 0) {
+            // Hitting this part of the code means we were jumping and are done.
+            // Let's reset the jump animation
+            Debug.Log("character is grounded now");
+            // SetJumping(false);
+            playerVelocity.y = 0f;
+            coyoteFrames = 0;
+            SetJumping(false);
+        }
+        float gravityScale = gravityValue;
+        // player has reached peak of jump and is starting to fall
+        if (playerVelocity.y < 0) {
+            // multiply gravity scale by multiplier for faster fall
+            gravityScale *= gravityFallingMultiplier;
+        }
+        // increase the player velocity by gravity scale to make player jump or fall
+        playerVelocity.y += gravityScale * Time.deltaTime;
+        // move the player down (0, falling velocity, 0)
+        // characterController.Move(playerVelocity * Time.deltaTime);
+        if (IsFalling()) {
+            coyoteFrames++;
+        }
+    }
+
+    private bool IsFalling() {
+        return characterController.isGrounded && animator.GetBool("isJumping");
+    }
+
+    private void SetJumping(bool jumping) {
+        animator.SetBool("isJumping", jumping);
+    }
 }
