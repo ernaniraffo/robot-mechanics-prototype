@@ -35,6 +35,8 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     /// <param name="context"></param>
     public void OnJump(InputAction.CallbackContext context)
     {
+        jumpInput = context.action.WasPressedThisFrame();
+        Debug.Log("Jump input was pressed this frame: " + jumpInput);
         switch (context.phase)
         {
             case InputActionPhase.Started:
@@ -47,6 +49,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
                 if (context.interaction is TapInteraction)
                 {
                     jumpInputCut = true;
+                    Debug.Log("Jump was cut");
                 }
                 break;
         }
@@ -108,12 +111,16 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         if (characterController.isGrounded) {
             SetJumping(false);
             playerVelocity.y = 0;
+            gravityValue = Physics.gravity.y;
         }
 
         // Jump if there is jump input
         if (jumpInput && characterController.isGrounded) {
             Jump();
-            jumpInput = false;
+            // jumpInput = false;
+        } else if (jumpInputCut && animator.GetBool("isJumping")) {
+            gravityValue *= gravityFallingMultiplier * 0.5f;
+            jumpInputCut = false;
         }
         // Calculate gravity
         HandleVerticalVelocity();
