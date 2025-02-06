@@ -1041,7 +1041,7 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3702727653573173453}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Robot_UsingPlayerInput, Assembly-CSharp
         m_MethodName: OnJump
         m_Mode: 0
@@ -1085,6 +1085,20 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 4758974347516445847, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
   m_PrefabInstance: {fileID: 3702727653573173452}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1220848646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1220848639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e4e7d0b4f9c04391a011c5867cd189d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpHeight: 1
+  gravityMultiplier: 3
 --- !u!1 &1259101821
 GameObject:
   m_ObjectHideFlags: 0
@@ -1224,7 +1238,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5129757496156242068, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
       propertyPath: gravityFallingMultiplier
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7078136030270616444, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1274,25 +1288,18 @@ PrefabInstance:
       propertyPath: gravityMultiplier
       value: 4
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5129757496156242068, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1832589894835765062, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1220848643}
+    - targetCorrespondingSourceObject: {fileID: 1832589894835765062, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1220848646}
   m_SourcePrefab: {fileID: 100100000, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
---- !u!114 &3702727653573173453 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5129757496156242068, guid: be5ce225a420f42e78cfa3250209604c, type: 3}
-  m_PrefabInstance: {fileID: 3702727653573173452}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1220848639}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fb13f25ace204be2b3c6ee87d1a270c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

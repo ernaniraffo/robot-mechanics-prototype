@@ -39,17 +39,13 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         Debug.Log("Jump input was pressed this frame: " + jumpInput);
         switch (context.phase)
         {
-            case InputActionPhase.Started:
-                // Set jump input to true if it has started
-                jumpInput = true;
-                break;
             case InputActionPhase.Performed:
                 // Check if the interaction has been released in the duration to be a tap interaction.
                 // If it is, we will cut the jump.
-                if (context.interaction is TapInteraction)
+                if (context.interaction is TapInteraction || context.interaction is SlowTapInteraction)
                 {
                     jumpInputCut = true;
-                    Debug.Log("Jump was cut");
+                    Debug.Log("Jump was cut. Status of jump input -> " + jumpInput);
                 }
                 break;
         }
@@ -177,11 +173,12 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         if (playerVelocity.y < 0) {
             // multiply gravity scale by multiplier for faster fall
             gravityScale *= gravityFallingMultiplier;
+            Debug.Log("New gravity scale: " + gravityScale);
         }
         // increase the player velocity by gravity scale to make player jump or fall
         playerVelocity.y += gravityScale * Time.deltaTime;
-        // move the player down (0, falling velocity, 0)
-        // characterController.Move(playerVelocity * Time.deltaTime);
+        Debug.Log("Player velocity: " + playerVelocity);
+
         if (IsFalling()) {
             coyoteFrames++;
         }
