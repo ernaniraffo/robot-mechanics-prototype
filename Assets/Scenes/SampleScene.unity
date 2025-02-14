@@ -1056,7 +1056,19 @@ MonoBehaviour:
     m_ActionId: 053ea1b2-6754-4210-ac0f-524b5475e832
     m_ActionName: gameplay/jump[/Mouse/leftButton,/Pen/tip]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3702727653573173453}
+        m_TargetAssemblyTypeName: Robot_UsingPlayerInput, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: cd9466f2-740b-498a-a3ef-91edebff8340
     m_ActionName: gameplay/move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
   - m_PersistentCalls:
@@ -1064,15 +1076,51 @@ MonoBehaviour:
     m_ActionId: e8e5d8a5-c915-4cd2-81a4-f7c2a18fae75
     m_ActionName: gameplay/look[/Mouse/delta,/Pen/delta]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3702727653573173453}
+        m_TargetAssemblyTypeName: Robot_UsingPlayerInput, Assembly-CSharp
+        m_MethodName: OnDodge
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: bd2e6f41-f3ad-4592-85f8-66239cd23c1d
     m_ActionName: gameplay/dodge[/Keyboard/q]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3702727653573173453}
+        m_TargetAssemblyTypeName: Robot_UsingPlayerInput, Assembly-CSharp
+        m_MethodName: OnDash
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: c74c1a12-c7b2-494b-985e-7d7495738f3b
     m_ActionName: gameplay/dash[/Mouse/rightButton,/Pen/barrel1]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3702727653573173453}
+        m_TargetAssemblyTypeName: Robot_UsingPlayerInput, Assembly-CSharp
+        m_MethodName: OnSprint
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: a256847f-fb41-4ad6-a30e-0ae7950378a0
     m_ActionName: gameplay/sprint[/Keyboard/leftShift]
   m_NeverAutoSwitchControlSchemes: 0

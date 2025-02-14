@@ -1,26 +1,31 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Interactions;
 
 public class Robot_UsingPlayerInput : MonoBehaviour
 {
-    // COMPONENTS
+    #region COMPONENTS
     private CharacterController characterController;
     private Animator animator;
+    #endregion
 
-    // PUBLIC VARIABLES
+    #region PUBLIC VARIABLES
     public float jumpHeight;
     public float gravityFallingMultiplier;
+    #endregion
 
-    // PRIVATE VARIABLES
+    #region PRIVATE VARIABLES
     private Vector3 playerVelocity;
     private float gravityValue = Physics.gravity.y;
     private float coyoteFrames = 0;
     private float coyoteFramesAllowed = 10;
+    private bool smallJump = false;
+    private bool mediumJump = false;
+    private float playerMoveSpeed = 5.0f;
+    private float maxFallSpeed = 10f;
+    #endregion
     
 
-    // INPUT VARIABLES
+    #region INPUT VARIABLES
     private bool jumpInput;
     private bool jumpInputCut;
     private Vector2 moveInput;
@@ -28,7 +33,9 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     private bool dodgeInput;
     private bool dashInput;
     private bool sprintInput;
+    #endregion
 
+    #region INPUT FUNCTIONS
     /// <summary>
     /// Store the jump input as a boolean.
     /// </summary>
@@ -36,19 +43,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     public void OnJump(InputAction.CallbackContext context)
     {
         jumpInput = context.action.WasPressedThisFrame();
-        Debug.Log("Jump input was pressed this frame: " + jumpInput);
-        switch (context.phase)
-        {
-            case InputActionPhase.Performed:
-                // Check if the interaction has been released in the duration to be a tap interaction.
-                // If it is, we will cut the jump.
-                if (context.interaction is TapInteraction || context.interaction is SlowTapInteraction)
-                {
-                    jumpInputCut = true;
-                    Debug.Log("Jump was cut. Status of jump input -> " + jumpInput);
-                }
-                break;
-        }
+        jumpInputCut = context.action.WasReleasedThisFrame();
     }
 
     /// <summary>
@@ -95,6 +90,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     {
         sprintInput = context.ReadValue<bool>();
     }
+    #endregion
 
     void Start()
     {
@@ -103,7 +99,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     }
 
     void Update()
-    {
+    {   
         if (characterController.isGrounded) {
             SetJumping(false);
             playerVelocity.y = 0;
@@ -113,8 +109,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         // Jump if there is jump input
         if (jumpInput && characterController.isGrounded) {
             Jump();
-            // jumpInput = false;
-        } else if (jumpInputCut && animator.GetBool("isJumping")) {
+        } else if (jumpInputCut && IsJumping() && playerVelocity.y > 0) {
             gravityValue *= gravityFallingMultiplier * 0.5f;
             jumpInputCut = false;
         }
@@ -148,9 +143,18 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     /// </summary>
     private void Move() {
         // Get the movement direction
-        Vector3 movementDirection = new Vector3(moveInput.x, playerVelocity.y, moveInput.y);
+        // Get the camera's forward and right vectors
+        Vector3 cameraForward = Camera.main.transform.forward;
+        Vector3 cameraRight = Camera.main.transform.right;
+        // Create a movement direction vector from the camera's forward and right vector and the
+        // player input
+        Vector3 forward = moveInput.y * cameraForward;
+        Vector3 right = moveInput.x * cameraRight;
         // Move the character in the movement direction with the player speed
-        // This last move call with update the collision flags
+        Vector3 movementDirection = (forward + right) * playerMoveSpeed;
+        // The Y axis is reserved for the gravity
+        movementDirection.y = playerVelocity.y;
+        // This is the last move call which will update the collision flags
         // It is recommended to only have one move method per frame since each call updates the
         // collision flags
         characterController.Move(movementDirection * Time.deltaTime);
@@ -174,6 +178,8 @@ public class Robot_UsingPlayerInput : MonoBehaviour
             // multiply gravity scale by multiplier for faster fall
             gravityScale *= gravityFallingMultiplier;
             Debug.Log("New gravity scale: " + gravityScale);
+            // clamp the player velocity so our fall speed is consistent
+            playerVelocity.y = Mathf.Max(playerVelocity.y, -maxFallSpeed);
         }
         // increase the player velocity by gravity scale to make player jump or fall
         playerVelocity.y += gravityScale * Time.deltaTime;
@@ -184,11 +190,19 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         }
     }
 
+    #region SETTERS
+    private void SetJumping(bool jumping) {
+        animator.SetBool("isJumping", jumping);
+    }
+    #endregion
+
+    #region GETTERS
     private bool IsFalling() {
         return characterController.isGrounded && animator.GetBool("isJumping");
     }
 
-    private void SetJumping(bool jumping) {
-        animator.SetBool("isJumping", jumping);
+    private bool IsJumping() {
+        return animator.GetBool("isJumping");
     }
+    #endregion
 }
