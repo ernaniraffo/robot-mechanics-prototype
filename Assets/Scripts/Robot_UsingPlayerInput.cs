@@ -133,8 +133,9 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         Debug.Log("Calculated player's Y velocity = " + playerVelocity.y);
         // Reset the coyote frames since we have started jumping
         coyoteFrames = 0;
-        // // Set the jumping animation
+        // Set the jumping animation
         SetJumping(true);
+        SetWalking(false);
     }
 
     /// <summary>
@@ -150,6 +151,9 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         // It is recommended to only have one move method per frame since each call updates the
         // collision flags
         characterController.Move(movementDirection * Time.deltaTime);
+        if (IsIdle() || IsFalling() || IsJumping()) return;
+        // Set the walking animation
+        SetWalking(true);
         // Debug.Log("Movement direction: " + movementDirection + " ## isGrounded: " + characterController.isGrounded);
     }
 
@@ -173,8 +177,16 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         if (Mathf.Abs(horizontal) < 0.05 && Mathf.Abs(vertical) < 0.05) {
             // don't rotate the character if it is not moving
             // removing this would cause the character to reset it's rotation when movement stops.
+            // set walking animation false
+            SetWalking(false);
+            if (!IsJumping() || !IsFalling()) {
+                // if we are not jumping and not moving and not falling, we are idle
+                SetIdle(true);
+            }
             return;
         }
+        // we cannot be idle if moving
+        SetIdle(false);
         // calculate the rotation
         float angle = Mathf.Rad2Deg * Mathf.Atan2(horizontal, vertical);
         Quaternion targetRotation = Quaternion.Euler(0, angle, 0);
@@ -188,7 +200,6 @@ public class Robot_UsingPlayerInput : MonoBehaviour
             // Hitting this part of the code means we were jumping and are done.
             // Let's reset the jump animation
             Debug.Log("character is grounded now");
-            // SetJumping(false);
             playerVelocity.y = 0f;
             coyoteFrames = 0;
             SetJumping(false);
@@ -215,15 +226,27 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     private void SetJumping(bool jumping) {
         animator.SetBool("isJumping", jumping);
     }
+
+    private void SetWalking(bool walking) {
+        animator.SetBool("isWalking", walking);
+    }
+
+    private void SetIdle(bool idle) {
+        animator.SetBool("isIdle", idle);
+    }
     #endregion
 
     #region GETTERS
     private bool IsFalling() {
-        return characterController.isGrounded && animator.GetBool("isJumping");
+        return !characterController.isGrounded && !IsJumping();
     }
 
     private bool IsJumping() {
         return animator.GetBool("isJumping");
+    }
+
+    private bool IsIdle() {
+        return animator.GetBool("isIdle");
     }
     #endregion
 }
