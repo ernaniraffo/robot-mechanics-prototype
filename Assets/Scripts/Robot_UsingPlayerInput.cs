@@ -22,6 +22,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     private bool mediumJump = false;
     private float playerMoveSpeed = 5.0f;
     private float maxFallSpeed = 10f;
+    private float rotationSpeed = 15.0f;
     #endregion
     
 
@@ -115,10 +116,9 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         }
         // Calculate gravity
         HandleVerticalVelocity();
-        // Rotate character in direction of movement before moving
         // TODO: add special dodge or go backwards if dodging but no movement
         // TODO: add dashing forwards when idle
-        // Move (includes dodging, dashing)
+        // Move (includes rotating the player)
         Move();
     }
 
@@ -143,6 +143,18 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     /// </summary>
     private void Move() {
         // Get the movement direction
+        Vector3 movementDirection = CalculateMovementDirection();
+        // Rotate the player in the movement direction. x-axis is horizontal, z-axis is vertical.
+        Rotate(movementDirection.x, movementDirection.z);
+        // This is the last move call which will update the collision flags
+        // It is recommended to only have one move method per frame since each call updates the
+        // collision flags
+        characterController.Move(movementDirection * Time.deltaTime);
+        // Debug.Log("Movement direction: " + movementDirection + " ## isGrounded: " + characterController.isGrounded);
+    }
+
+    private Vector3 CalculateMovementDirection() {
+        // Get the movement direction
         // Get the camera's forward and right vectors
         Vector3 cameraForward = Camera.main.transform.forward;
         Vector3 cameraRight = Camera.main.transform.right;
@@ -154,11 +166,20 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         Vector3 movementDirection = (forward + right) * playerMoveSpeed;
         // The Y axis is reserved for the gravity
         movementDirection.y = playerVelocity.y;
-        // This is the last move call which will update the collision flags
-        // It is recommended to only have one move method per frame since each call updates the
-        // collision flags
-        characterController.Move(movementDirection * Time.deltaTime);
-        Debug.Log("Movement direction: " + movementDirection + " ## isGrounded: " + characterController.isGrounded);
+        return movementDirection; 
+    }
+
+    private void Rotate(float horizontal, float vertical) {
+        if (Mathf.Abs(horizontal) < 0.05 && Mathf.Abs(vertical) < 0.05) {
+            // don't rotate the character if it is not moving
+            // removing this would cause the character to reset it's rotation when movement stops.
+            return;
+        }
+        // calculate the rotation
+        float angle = Mathf.Rad2Deg * Mathf.Atan2(horizontal, vertical);
+        Quaternion targetRotation = Quaternion.Euler(0, angle, 0);
+        // set the rotation
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
     private void HandleVerticalVelocity() {
