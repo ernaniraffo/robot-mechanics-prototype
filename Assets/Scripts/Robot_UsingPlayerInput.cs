@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,6 +24,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     private float playerMoveSpeed = 5.0f;
     private float maxFallSpeed = 10f;
     private float rotationSpeed = 15.0f;
+    private bool dashing;
     #endregion
     
 
@@ -71,7 +73,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     /// <param name="context"></param>
     public void OnDodge(InputAction.CallbackContext context)
     {
-        dodgeInput = context.ReadValue<bool>();
+        dodgeInput = context.ReadValueAsButton();
     }
 
     /// <summary>
@@ -80,7 +82,7 @@ public class Robot_UsingPlayerInput : MonoBehaviour
     /// <param name="context"></param>
     public void OnDash(InputAction.CallbackContext context)
     {
-        dashInput = context.ReadValue<bool>();
+        dashInput = context.ReadValueAsButton();
     }
 
     /// <summary>
@@ -107,12 +109,28 @@ public class Robot_UsingPlayerInput : MonoBehaviour
             gravityValue = Physics.gravity.y;
         }
 
+        // set the dodge animation boolean to false
+        // if the animation is not finished, player is still dodging
+        if (!dodgeInput && IsDodging()) {
+            SetDodging(false);
+        }
+
         // Jump if there is jump input
         if (jumpInput && characterController.isGrounded) {
             Jump();
         } else if (jumpInputCut && IsJumping() && playerVelocity.y > 0) {
             gravityValue *= gravityFallingMultiplier * 0.5f;
             jumpInputCut = false;
+        } else if (!IsJumping() && dodgeInput && !IsDodging()) {
+            // set dodging to true
+            SetWalking(false);
+            SetIdle(false);
+            SetJumping(false);
+            
+            SetDodging(true);
+        } else if (!dashing && dashInput && !IsDodging()) {
+            // Dash only if the player is not dodging
+            Dash();
         }
         // Calculate gravity
         HandleVerticalVelocity();
@@ -222,6 +240,37 @@ public class Robot_UsingPlayerInput : MonoBehaviour
         }
     }
 
+    private void Dash() {
+        StartCoroutine(EnableDashing());
+    }
+
+    IEnumerator EnableDashing() {
+        dashing = true;
+        // Dash for 0.25 seconds
+        float dashTime = 0.25f;
+        // Save the time in which the dashing started
+        float startTime = Time.time;
+        // Save the original player speed
+        float originalPlayerSpeed = playerMoveSpeed;
+        // Multiply the player speed to dash
+        playerMoveSpeed *= 4;
+        while (Time.time < startTime + dashTime) {
+            yield return null;
+        }
+        // // Now that we have dashed, cool down for 0.25 seconds
+        // float coolDownTime = 0.25f;
+        // // Reduce the player original speed by half during the cool down
+        // playerSpeed = originalPlayerSpeed / 2;
+        // // Cool down for some time
+        // float coolDownStartTime = Time.time;
+        // while (Time.time < coolDownStartTime + coolDownTime) {
+        //     yield return null;
+        // }
+        // Revert the speed to the original speed
+        playerMoveSpeed = originalPlayerSpeed;
+        dashing = false;
+    }
+
     #region SETTERS
     private void SetJumping(bool jumping) {
         animator.SetBool("isJumping", jumping);
@@ -233,6 +282,10 @@ public class Robot_UsingPlayerInput : MonoBehaviour
 
     private void SetIdle(bool idle) {
         animator.SetBool("isIdle", idle);
+    }
+
+    private void SetDodging(bool dodging) {
+        animator.SetBool("isDodging", dodging);
     }
     #endregion
 
@@ -247,6 +300,10 @@ public class Robot_UsingPlayerInput : MonoBehaviour
 
     private bool IsIdle() {
         return animator.GetBool("isIdle");
+    }
+
+    private bool IsDodging() {
+        return animator.GetBool("isDodging");
     }
     #endregion
 }
